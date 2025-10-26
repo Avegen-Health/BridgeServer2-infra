@@ -10,7 +10,7 @@ branches:
   - prod
 install:
   - ./setup_aws_cli.sh || travis_terminate 1
-  - pip install orderedset==4.1.0 aws-sam-translator>=1.50.0 cfn-lint sceptre sceptre-ssm-resolver
+  - pip install deepdiff>=5.8.0,<6.0 aws-sam-translator>=1.50.0 cfn-lint sceptre sceptre-ssm-resolver
 stages:
   - name: validate
   - name: deploy
