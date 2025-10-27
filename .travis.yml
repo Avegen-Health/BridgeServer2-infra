@@ -18,7 +18,7 @@ stages:
 jobs:
   include:
     - stage: validate
-      script: cfn-lint ./templates/**/* --ignore-checks W
+      script: cfn-lint ./templates/**/* --ignore-checks W1011
     - stage: deploy
       script:
         - sceptre launch common --yes
