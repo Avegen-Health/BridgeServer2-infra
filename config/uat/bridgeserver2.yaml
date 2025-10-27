@@ -4,14 +4,14 @@ depedencies:
   - common/bridgeserver2-common.yaml
   - uat/bridgeserver2-db.yaml
 parameters:
-  AppDeployBucket: org-sagebridge-bridgeserver2-deployment-devstaging
+  AppDeployBucket: org-gvbridge-bridgeserver2-deployment-devstaging
   AppHealthcheckUrl: '/'
-  AttachmentBucket: org-sagebridge-attachment-devstaging
+  AttachmentBucket: org-gvbridge-attachment-devstaging
   AwsAutoScalingMaxSize: '1'
   AwsAutoScalingMinSize: '1'
   AwsEbHealthReportingSystem: enhanced
   AwsSnsBounceNotificationEndpoint: bridgepf-uat-bounce-notifications@sagebase.org
-  AwsSnsNotificationEndpoint: bridgepf-uat@sagebase.org
+  AwsSnsNotificationEndpoint: akash.shinde@avegenhealth.com
   BootstrapAdminEmail: !ssm /bridgeserver2-uat/BootstrapAdminEmail
   BootstrapAdminPassword: !ssm /bridgeserver2-uat/BootstrapAdminPassword
   BridgeEnv: uat
@@ -38,7 +38,7 @@ parameters:
   SynapseUser: !ssm /bridgeserver2-uat/SynapseUser
   SynapseOAuthClientId: !ssm /bridgeserver2-uat/SynapseOAuthClientId
   SynapseOAuthClientSecret: !ssm /bridgeserver2-uat/SynapseOAuthClientSecret
-  UddSqsQueueUrl: https://sqs.us-east-1.amazonaws.com/420786776710/Bridge-WorkerPlatform-Request-staging
+  UddSqsQueueUrl: https://sqs.us-east-1.amazonaws.com/433864969993/Bridge-WorkerPlatform-Request-staging
   CrcGeoCodeApiKey: !ssm /bridgeserver2-uat/CrcGeoCodeApiKey
   CuimcTestUsername: !ssm /bridgeserver2-common/CuimcTestUsername
   CuimcTestPassword: !ssm /bridgeserver2-common/CuimcTestPassword
