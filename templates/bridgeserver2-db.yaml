@@ -40,8 +40,8 @@ Resources:
       Engine: 'aurora-mysql'
       EngineMode: 'provisioned'
       EngineVersion: !Ref MySqlVersion
-      MasterUsername: !ssm /bridgeserver2-uat/HibernateConnectionUsername
-      MasterUserPassword: !ssm /bridgeserver2-uat/HibernateConnectionPassword
+      MasterUsername: !Ref HibernateConnectionUsername
+      MasterUserPassword: !Ref HibernateConnectionPassword
       Port: 3306
       PreferredMaintenanceWindow: Mon:10:00-Mon:10:30
       StorageEncrypted: true
