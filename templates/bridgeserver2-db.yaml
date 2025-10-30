@@ -12,7 +12,7 @@ Parameters:
     Default: 'us-east-1a,us-east-1b,us-east-1c'
   DatabaseInstanceType:
     Type: String
-    Default: 'db.t2.small'
+    Default: 'db.t3.small'
   DatabaseReplicaAvailabilityZone:
     Type: AWS::EC2::AvailabilityZone::Name
     Default: 'us-east-1b'
