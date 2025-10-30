@@ -1,10 +1,10 @@
 Description: Common resources for all stacks of BridgeServer2 Application
 AWSTemplateFormatVersion: 2010-09-09
-Parameters:
-  # DNSDomainName:
-  #   Description: DNS Domain name for Bridge Server
-  #   Type: String
-  #   Default: 'sagebridge.org'
+# Parameters:
+#   DNSDomainName:
+#     Description: DNS Domain name for Bridge Server
+#     Type: String
+#     Default: 'sagebridge.org'
 Resources:
   BeanstalkServiceRole:
     Type: 'AWS::IAM::Role'
