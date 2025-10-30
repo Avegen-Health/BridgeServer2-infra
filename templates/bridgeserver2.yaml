@@ -493,17 +493,17 @@ Resources:
       VpcSecurityGroupIds:
         - !GetAtt ElasticacheSecurityGroup.GroupId
       CacheSubnetGroupName: !Ref ElasticacheSubnetGroup
-  ElasticacheReplicationGroup:
-    Type: 'AWS::ElastiCache::ReplicationGroup'
-    Properties:
-      ReplicationGroupDescription: !Join
-        - '-'
-        - - !Ref 'AWS::StackName'
-          - ElasticacheReplicationGroup
-      AutomaticFailoverEnabled: false
-      EngineVersion: '6.0'
-      PrimaryClusterId: !Ref ElasticacheCluster
-      ReplicasPerNodeGroup: 1
+  # ElasticacheReplicationGroup:
+  #   Type: 'AWS::ElastiCache::ReplicationGroup'
+  #   Properties:
+  #     ReplicationGroupDescription: !Join
+  #       - '-'
+  #       - - !Ref 'AWS::StackName'
+  #         - ElasticacheReplicationGroup
+  #     AutomaticFailoverEnabled: false
+  #     EngineVersion: '6.0'
+  #     PrimaryClusterId: !Ref ElasticacheCluster
+  #     ReplicasPerNodeGroup: 1
   AWSEC2SecurityGroup:
     Type: 'AWS::EC2::SecurityGroup'
     Properties:
