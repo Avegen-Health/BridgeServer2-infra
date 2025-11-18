@@ -19,8 +19,8 @@ parameters:
   BridgeHealthcodeRedisKey: !ssm /bridgeserver2-uat/BridgeHealthcodeRedisKey
   BridgeUser: heroku
   BucketSuffix: devstaging
-  DNSHostname: bridgeserver2-devstaging
-  DNSDomain: sagebridge.org
+  DNSHostname: bridge-uat
+  DNSDomain: grip-research.org
   EC2InstanceType: t3a.medium
   EmailUnsubscribeToken: !ssm /bridgeserver2-common/EmailUnsubscribeToken
   Env: staging
