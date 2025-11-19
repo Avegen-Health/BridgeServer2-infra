@@ -37,7 +37,7 @@ Resources:
             DeleteSourceFromS3: true
             Enabled: true
             MaxAgeInDays: 90
-  # SSLCertificate:
+  SSLCertificate:
     Type: AWS::CertificateManager::Certificate
     Properties:
       DomainName: !Join
