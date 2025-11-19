@@ -4,7 +4,7 @@ Parameters:
   DNSDomainName:
     Description: DNS Domain name for Bridge Server
     Type: String
-    Default: 'grip-research.org'
+    Default: 'avegen.in'
 Resources:
   BeanstalkServiceRole:
     Type: 'AWS::IAM::Role'
