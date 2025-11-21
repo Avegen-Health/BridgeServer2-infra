@@ -20,7 +20,7 @@ parameters:
   BridgeUser: heroku
   BucketSuffix: devstaging
   DNSHostname: bridge-uat
-  DNSDomain: avegen.in
+  DNSDomain: bridge-uat.grip-research.org
   EC2InstanceType: t3a.medium
   EmailUnsubscribeToken: !ssm /bridgeserver2-common/EmailUnsubscribeToken
   Env: staging
