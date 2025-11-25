@@ -30,7 +30,7 @@ parameters:
   HibernateConnectionPassword: !ssm /bridgeserver2-uat/HibernateConnectionPassword
   HibernateConnectionUsername: !ssm /bridgeserver2-uat/HibernateConnectionUsername
   HibernateConnectionUsessl: 'true'
-  HostPostfix: -devstaging.gvbridge.org
+  HostPostfix: -uat.grip-research.org
   NewRelicAppName: bridgeserver2-devstaging
   NewRelicLicenseKey: !ssm /infra/NewRelicLicenseKey
   SesNotificationTopicArn: arn:aws:sns:us-east-1:420786776710:SNSBounces
