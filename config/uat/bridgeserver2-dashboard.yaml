@@ -4,5 +4,5 @@ depedencies:
   - uat/bridgeserver2.yaml
 parameters:
   AwsAutoScalingGroupName: awseb-e-wpygkt3rxe-stack-AWSEBAutoScalingGroup-1713G6ZQQVZ9Q
-  AwsLoadBalancerName: awseb-AWSEB-1SRC5HKN6BHKG/5c45c9f5394e80bd
+  AwsLoadBalancerName: awseb--AWSEB-jlkPR3pHPO3w/bae888c80736abbc
   EnvironmentName: bridgeserver2-uat

@@ -190,7 +190,7 @@ Resources:
     Type: 'AWS::ElasticBeanstalk::ConfigurationTemplate'
     Properties:
       ApplicationName: !ImportValue us-east-1-bridgeserver2-common-BeanstalkAppName
-      SolutionStackName: '64bit Amazon Linux 2 v4.8.2 running Tomcat 9 Corretto 8'
+      SolutionStackName: '64bit Amazon Linux 2 v4.9.7 running Tomcat 9 Corretto 8'
       OptionSettings:
         # EB environment options
         - Namespace: 'aws:autoscaling:asg'
@@ -233,19 +233,19 @@ Resources:
           OptionName: ELBSubnets
           Value: !Join
             - ','
-            - - !ImportValue us-east-1-BridgeServer2-vpc-PublicSubnet
-              - !ImportValue us-east-1-BridgeServer2-vpc-PublicSubnet1
-              - !ImportValue us-east-1-BridgeServer2-vpc-PublicSubnet2
+            - - !ImportValue us-east-1-bridge-vpc-with-subnets-PublicSubnet1
+              - !ImportValue us-east-1-bridge-vpc-with-subnets-PublicSubnet2
+              - !ImportValue us-east-1-bridge-vpc-with-subnets-PublicSubnet3
         - Namespace: 'aws:ec2:vpc'
           OptionName: Subnets
           Value: !Join
             - ','
-            - - !ImportValue us-east-1-BridgeServer2-vpc-PrivateSubnet
-              - !ImportValue us-east-1-BridgeServer2-vpc-PrivateSubnet1
-              - !ImportValue us-east-1-BridgeServer2-vpc-PrivateSubnet2
+            - - !ImportValue us-east-1-bridge-vpc-with-subnets-PrivateSubnet1
+              - !ImportValue us-east-1-bridge-vpc-with-subnets-PrivateSubnet2
+              - !ImportValue us-east-1-bridge-vpc-with-subnets-PrivateSubnet3
         - Namespace: 'aws:ec2:vpc'
           OptionName: VPCId
-          Value: !ImportValue us-east-1-BridgeServer2-vpc-VPCId
+          Value: !ImportValue us-east-1-bridge-vpc-with-subnets-VPC
         - Namespace: 'aws:ec2:vpc'
           OptionName: AssociatePublicIpAddress
           Value: 'false'
@@ -464,7 +464,7 @@ Resources:
         - '-'
         - - !Ref 'AWS::StackName'
           - ElasticacheSecurityGroup
-      VpcId: !ImportValue us-east-1-BridgeServer2-vpc-VPCId
+      VpcId: !ImportValue us-east-1-bridge-vpc-with-subnets-VPC
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 6379
@@ -478,12 +478,12 @@ Resources:
           - - !Ref 'AWS::StackName'
             - ElasticacheSubnetGroup
       SubnetIds:
-        - !ImportValue us-east-1-BridgeServer2-vpc-PublicSubnet
-        - !ImportValue us-east-1-BridgeServer2-vpc-PublicSubnet1
-        - !ImportValue us-east-1-BridgeServer2-vpc-PublicSubnet2
-        - !ImportValue us-east-1-BridgeServer2-vpc-PrivateSubnet
-        - !ImportValue us-east-1-BridgeServer2-vpc-PrivateSubnet1
-        - !ImportValue us-east-1-BridgeServer2-vpc-PrivateSubnet2
+        - !ImportValue us-east-1-bridge-vpc-with-subnets-PrivateSubnet1
+        - !ImportValue us-east-1-bridge-vpc-with-subnets-PrivateSubnet2
+        - !ImportValue us-east-1-bridge-vpc-with-subnets-PrivateSubnet3
+        - !ImportValue us-east-1-bridge-vpc-with-subnets-PublicSubnet1
+        - !ImportValue us-east-1-bridge-vpc-with-subnets-PublicSubnet2
+        - !ImportValue us-east-1-bridge-vpc-with-subnets-PublicSubnet3
   ElasticacheCluster:
     Type: 'AWS::ElastiCache::CacheCluster'
     Properties:
@@ -493,17 +493,17 @@ Resources:
       VpcSecurityGroupIds:
         - !GetAtt ElasticacheSecurityGroup.GroupId
       CacheSubnetGroupName: !Ref ElasticacheSubnetGroup
-  ElasticacheReplicationGroup:
-    Type: 'AWS::ElastiCache::ReplicationGroup'
-    Properties:
-      ReplicationGroupDescription: !Join
-        - '-'
-        - - !Ref 'AWS::StackName'
-          - ElasticacheReplicationGroup
-      AutomaticFailoverEnabled: false
-      EngineVersion: '6.0'
-      PrimaryClusterId: !Ref ElasticacheCluster
-      ReplicasPerNodeGroup: 1
+  # ElasticacheReplicationGroup:
+  #   Type: 'AWS::ElastiCache::ReplicationGroup'
+  #   Properties:
+  #     ReplicationGroupDescription: !Join
+  #       - '-'
+  #       - - !Ref 'AWS::StackName'
+  #         - ElasticacheReplicationGroup
+  #     AutomaticFailoverEnabled: false
+  #     EngineVersion: '6.0'
+  #     PrimaryClusterId: !Ref ElasticacheCluster
+  #     ReplicasPerNodeGroup: 1
   AWSEC2SecurityGroup:
     Type: 'AWS::EC2::SecurityGroup'
     Properties:
@@ -512,7 +512,7 @@ Resources:
         - - !Ref 'AWS::StackName'
           - AWSEC2SecurityGroup
       GroupDescription: EC2 Security Group
-      VpcId: !ImportValue us-east-1-BridgeServer2-vpc-VPCId
+      VpcId: !ImportValue us-east-1-bridge-vpc-with-subnets-VPC
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 80
@@ -531,7 +531,7 @@ Resources:
     Type: 'AWS::EC2::SecurityGroup'
     Properties:
       GroupDescription: Load Balancer Security Group
-      VpcId: !ImportValue us-east-1-BridgeServer2-vpc-VPCId
+      VpcId: !ImportValue us-east-1-bridge-vpc-with-subnets-VPC
       SecurityGroupIngress:
         - CidrIp: 0.0.0.0/0
           FromPort: 443
@@ -1028,7 +1028,6 @@ Resources:
                     - ':root'
                 - !ImportValue us-east-1-bootstrap-CfServiceRoleArn
                 - !GetAtt AWSIAMRole.Arn
-                - !ImportValue us-east-1-bridgeserver2-common-BeanstalkServiceRoleArn
             Action:
               - "kms:Encrypt"
               - "kms:Decrypt"
