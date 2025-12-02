@@ -3,4 +3,4 @@ stack_name: bridgeserver2-https-redirect-prod
 depedencies:
   - prod/bridgeserver2.yaml
 parameters:
-  LoadBalancerArn: "arn:aws:elasticloadbalancing:us-east-1:649232250620:loadbalancer/app/awseb-AWSEB-8IYQI4F40LAM/6216119ed73ce6eb"
+  LoadBalancerArn: "arn:aws:elasticloadbalancing:us-east-1:433864969993:loadbalancer/app/gvbridge-prod/fb759e2f2a16f636"
