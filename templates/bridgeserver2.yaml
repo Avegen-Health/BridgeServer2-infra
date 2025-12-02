@@ -316,9 +316,9 @@ Resources:
         - Namespace: 'aws:elbv2:listener:default'
           OptionName: Protocol
           Value: HTTP
-        - Namespace: 'aws:elbv2:listener:443'
-          OptionName: Protocol
-          Value: HTTPS
+#        - Namespace: 'aws:elbv2:listener:443'
+#          OptionName: Protocol
+#          Value: HTTPS
 #        - Namespace: 'aws:elbv2:listener:443'
 #          OptionName: SSLCertificateArns
 #          Value: !ImportValue us-east-1-bridgeserver2-common-SSLCertificate
