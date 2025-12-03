@@ -489,7 +489,7 @@ Resources:
     Properties:
       Engine: redis
       CacheNodeType: cache.t2.micro
-      NumCacheNodes: 2
+      NumCacheNodes: 1
       VpcSecurityGroupIds:
         - !GetAtt ElasticacheSecurityGroup.GroupId
       CacheSubnetGroupName: !Ref ElasticacheSubnetGroup
@@ -1121,3 +1121,6 @@ Outputs:
     Value: !GetAtt AWSIAMBridgeServer2ServiceUserAccessKey.SecretAccessKey
     Export:
       Name: !Sub '${AWS::Region}-${AWS::StackName}-BridgeServer2ServiceUserSecretAccessKey'
+Tags:
+    - Key: RecreatedAt
+      Value: "2025-12-03-manual-recovery"
