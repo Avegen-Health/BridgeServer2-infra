@@ -22,4 +22,4 @@ jobs:
     - stage: deploy
       script:
         - sceptre launch common --yes
-        - sceptre launch $TRAVIS_BRANCH --yes
+        - sceptre launch $TRAVIS_BRANCH --yes --force
