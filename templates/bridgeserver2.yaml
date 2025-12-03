@@ -488,7 +488,7 @@ Resources:
     Type: 'AWS::ElastiCache::CacheCluster'
     Properties:
       Engine: redis
-      CacheNodeType: cache.t2.micro
+      CacheNodeType: cache.t4g.medium
       NumCacheNodes: 1
       VpcSecurityGroupIds:
         - !GetAtt ElasticacheSecurityGroup.GroupId
@@ -1121,6 +1121,3 @@ Outputs:
     Value: !GetAtt AWSIAMBridgeServer2ServiceUserAccessKey.SecretAccessKey
     Export:
       Name: !Sub '${AWS::Region}-${AWS::StackName}-BridgeServer2ServiceUserSecretAccessKey'
-Tags:
-    - Key: RecreatedAt
-      Value: "2025-12-03-manual-recovery"
