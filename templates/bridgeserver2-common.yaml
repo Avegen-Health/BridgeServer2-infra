@@ -4,7 +4,7 @@ Parameters:
   DNSDomainName:
     Description: DNS Domain name for Bridge Server
     Type: String
-    Default: 'grip-reasearch.org'
+    Default: 'bridge-uat.grip-reasearch.org'
 Resources:
   BeanstalkServiceRole:
     Type: 'AWS::IAM::Role'
