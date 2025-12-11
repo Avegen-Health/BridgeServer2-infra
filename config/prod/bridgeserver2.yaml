@@ -7,8 +7,8 @@ parameters:
   AppDeployBucket: org-gvbridge-bridgeserver2-deployment-prod
   AppHealthcheckUrl: '/'
   AttachmentBucket: org-gvbridge-attachment-prod
-  AwsAutoScalingMaxSize: "4"
-  AwsAutoScalingMinSize: "3"
+  AwsAutoScalingMaxSize: "2"
+  AwsAutoScalingMinSize: "2"
   AwsEbHealthReportingSystem: enhanced
   AwsSnsBounceNotificationEndpoint: akash.shinde@avegenhealth.com
   AwsSnsNotificationEndpoint: akash.shinde@avegenhealth.com
