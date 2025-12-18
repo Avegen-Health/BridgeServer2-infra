@@ -331,25 +331,25 @@ Resources:
           Value: ELBSecurityPolicy-TLS-1-2-2017-01
         # Application environment options
         - Namespace: 'aws:elasticbeanstalk:application:environment'
-          OptionName: admin.email
+          OptionName: ADMIN_EMAIL
           Value: !Ref BootstrapAdminEmail
         - Namespace: 'aws:elasticbeanstalk:application:environment'
-          OptionName: admin.password
+          OptionName: ADMIN_PASSWORD
           Value: !Ref BootstrapAdminPassword
         - Namespace: 'aws:elasticbeanstalk:application:environment'
           OptionName: ENV
           Value: !Ref Env
         - Namespace: 'aws:elasticbeanstalk:application:environment'
-          OptionName: bridge.env
+          OptionName: BRIDGE_ENV
           Value: !Ref BridgeEnv
         - Namespace: 'aws:elasticbeanstalk:application:environment'
-          OptionName: bridge.healthcode.redis.key
+          OptionName: BRIDGE_HEALTHCODE_REDIS_KEY
           Value: !Ref BridgeHealthcodeRedisKey
         - Namespace: 'aws:elasticbeanstalk:application:environment'
-          OptionName: bridge.user
+          OptionName: BRIDGE_USER
           Value: !Ref BridgeUser
         - Namespace: 'aws:elasticbeanstalk:application:environment'
-          OptionName: elasticache.new.url
+          OptionName: ELASTICACHE_NEW_URL
           Value: !Join
             - ''
             - - 'redis://'
@@ -357,7 +357,7 @@ Resources:
               - ':'
               - !GetAtt ElasticacheCluster.RedisEndpoint.Port
         - Namespace: 'aws:elasticbeanstalk:application:environment'
-          OptionName: elasticache.url
+          OptionName: ELASTICACHE_URL
           Value: !Join
             - ''
             - - 'redis://'
@@ -365,44 +365,44 @@ Resources:
               - ':'
               - !GetAtt ElasticacheCluster.RedisEndpoint.Port
         - Namespace: 'aws:elasticbeanstalk:application:environment'
-          OptionName: email.unsubscribe.token
+          OptionName: EMAIL_UNSUBSCRIBE_TOKEN
           Value: !Ref EmailUnsubscribeToken
         - Namespace: 'aws:elasticbeanstalk:application:environment'
-          OptionName: exporter.request.sqs.queue.url
+          OptionName: EXPORTER_REQUEST_SQS_QUEUE_URL
           Value: !Ref ExporterRequestSqsQueueUrl
         - Namespace: 'aws:elasticbeanstalk:application:environment'
-          OptionName: exporter.synapse.access.token
+          OptionName: EXPORTER_SYNAPSE_ACCESS_TOKEN
           Value: !Ref ExporterSynapseAccessToken
         - Namespace: 'aws:elasticbeanstalk:application:environment'
-          OptionName: exporter.synapse.user
+          OptionName: EXPORTER_SYNAPSE_USER
           Value: !Ref ExporterSynapseUser
         - Namespace: 'aws:elasticbeanstalk:application:environment'
           OptionName: !Join
             - ''
             - - !Ref BridgeEnv
-              - '.bucket.suffix'
+              - '_BUCKET_SUFFIX'
           Value: !Ref BucketSuffix
         - Namespace: 'aws:elasticbeanstalk:application:environment'
-          OptionName: hibernate.connection.password
+          OptionName: HIBERNATE_CONNECTION_PASSWORD
           Value: !Ref HibernateConnectionPassword
         - Namespace: 'aws:elasticbeanstalk:application:environment'
-          OptionName: hibernate.connection.url
+          OptionName: HIBERNATE_CONNECTION_URL
           Value: !Join
             - ''
             - - 'jdbc:mysql://'
               - Fn::ImportValue: !Sub "${AWS::Region}-${BridgeDBStackName}-DatabaseEndpointAddress"
               - ':3306/BridgeDB'
         - Namespace: 'aws:elasticbeanstalk:application:environment'
-          OptionName: hibernate.connection.username
+          OptionName: HIBERNATE_CONNECTION_USERNAME
           Value: !Ref HibernateConnectionUsername
         - Namespace: 'aws:elasticbeanstalk:application:environment'
-          OptionName: hibernate.connection.useSSL
+          OptionName: HIBERNATE_CONNECTION_USE_SSL
           Value: !Ref HibernateConnectionUsessl
         - Namespace: 'aws:elasticbeanstalk:application:environment'
           OptionName: !Join
             - ''
             - - !Ref BridgeEnv
-              - '.host.postfix'
+              - '_HOST_POSTFIX'
           Value: !Ref HostPostfix
         - Namespace: 'aws:elasticbeanstalk:application:environment'
           OptionName: NEW_RELIC_APP_NAME
@@ -411,43 +411,43 @@ Resources:
           OptionName: NEW_RELIC_LICENSE_KEY
           Value: !Ref NewRelicLicenseKey
         - Namespace: 'aws:elasticbeanstalk:application:environment'
-          OptionName: ses.notification.topic.arn
+          OptionName: SES_NOTIFICATION_TOPIC_ARN
           Value: !Ref SesNotificationTopicArn
         - Namespace: 'aws:elasticbeanstalk:application:environment'
-          OptionName: synapse.access.token
+          OptionName: SYNAPSE_ACCESS_TOKEN
           Value: !Ref SynapseAccessToken
         - Namespace: 'aws:elasticbeanstalk:application:environment'
-          OptionName: synapse.user
+          OptionName: SYNAPSE_USER
           Value: !Ref SynapseUser
         - Namespace: 'aws:elasticbeanstalk:application:environment'
-          OptionName: synapse.oauth.client.id
+          OptionName: SYNAPSE_OAUTH_CLIENT_ID
           Value: !Ref SynapseOAuthClientId
         - Namespace: 'aws:elasticbeanstalk:application:environment'
-          OptionName: synapse.oauth.client.secret
+          OptionName: SYNAPSE_OAUTH_CLIENT_SECRET
           Value: !Ref SynapseOAuthClientSecret
         - Namespace: 'aws:elasticbeanstalk:application:environment'
-          OptionName: udd.sqs.queue.url
+          OptionName: UDD_SQS_QUEUE_URL
           Value: !Ref UddSqsQueueUrl
         - Namespace: 'aws:elasticbeanstalk:application:environment'
-          OptionName: use.https.forwarding
+          OptionName: USE_HTTPS_FORWARDING
           Value: !Ref UseHttpsForwarding
         - Namespace: 'aws:elasticbeanstalk:application:environment'
-          OptionName: crc.geocode.api.key
+          OptionName: CRC_GEOCODE_API_KEY
           Value: !Ref CrcGeoCodeApiKey
         - Namespace: 'aws:elasticbeanstalk:application:environment'
-          OptionName: cuimc.test.username
+          OptionName: CUIMC_TEST_USERNAME
           Value: !Ref CuimcTestUsername
         - Namespace: 'aws:elasticbeanstalk:application:environment'
-          OptionName: cuimc.test.password
+          OptionName: CUIMC_TEST_PASSWORD
           Value: !Ref CuimcTestPassword
         - Namespace: 'aws:elasticbeanstalk:application:environment'
-          OptionName: cuimc.prod.username
+          OptionName: CUIMC_PROD_USERNAME
           Value: !Ref CuimcProdUsername
         - Namespace: 'aws:elasticbeanstalk:application:environment'
-          OptionName: cuimc.prod.password
+          OptionName: CUIMC_PROD_PASSWORD
           Value: !Ref CuimcProdPassword
         - Namespace: 'aws:elasticbeanstalk:application:environment'
-          OptionName: gbf.api.key
+          OptionName: GBF_API_KEY
           Value: !Ref GbfApiKey
   AWSEBEnvironment:
     Type: 'AWS::ElasticBeanstalk::Environment'
