@@ -1,0 +1,76 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Creates SSM parameters for Bridge and SageMaker-Synapse integration
+
+Parameters:
+  ApiEndpoint:
+    Type: String
+    Default: https://api-new-account.example.com
+    Description: API Gateway endpoint for the mobile app
+  RdsPassword:
+    Type: String
+    Default: defaultpassword123
+    NoEcho: true
+    Description: RDS password for SageMaker-Synapse
+  SynapseProjectId:
+    Type: String
+    Default: syn123456789
+    Description: Synapse project ID for Bridge data
+  KmsKeyId:
+    Type: String
+    Default: alias/aws/ssm
+    Description: KMS key ID or alias for SecureString encryption
+
+Resources:
+  ApiEndpointParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: /new-account/bridge/api-endpoint
+      Type: String
+      Value: !Ref ApiEndpoint
+      Description: API Gateway endpoint for the mobile app
+      Tags:
+        - Key: Project
+          Value: Bridge
+
+  RdsPasswordParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: /sagemaker-synapse/rds-password
+      Type: SecureString
+      Value: !Ref RdsPassword
+      KeyId: !Ref KmsKeyId
+      Description: RDS password for SageMaker-Synapse
+      Tags:
+        - Key: Project
+          Value: SageMaker-Synapse
+
+  SynapseProjectIdParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: /new-account/bridge/synapse-project-id
+      Type: String
+      Value: !Ref SynapseProjectId
+      Description: Synapse project ID for Bridge data
+      Tags:
+        - Key: Project
+          Value: Bridge
+
+Outputs:
+  ApiEndpointParameterName:
+    Description: Name of the API endpoint parameter
+    Value: !Ref ApiEndpointParameter
+    Export:
+      Name: !Sub ${AWS::Region}-${AWS::StackName}-ApiEndpoint
+
+  RdsPasswordParameterName:
+    Description: Name of the RDS password parameter
+    Value: !Ref RdsPasswordParameter
+    Export:
+      Name: !Sub ${AWS::Region}-${AWS::StackName}-RdsPassword
+
+  SynapseProjectIdParameterName:
+    Description: Name of the Synapse project ID parameter
+    Value: !Ref SynapseProjectIdParameter
+    Export:
+      Name: !Sub ${AWS::Region}-${AWS::StackName}-SynapseProjectId
+

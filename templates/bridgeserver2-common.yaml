@@ -37,7 +37,15 @@ Resources:
             DeleteSourceFromS3: true
             Enabled: true
             MaxAgeInDays: 90
-  SSLCertificate:
+  SSLCertificateLegacy:
+    Type: AWS::CertificateManager::Certificate
+    Properties:
+      DomainName: '*.avegen.in'
+      DomainValidationOptions:
+        - DomainName: '*.avegen.in'
+          ValidationDomain: avegen.in
+      ValidationMethod: DNS
+  SSLCertificateNew:
     Type: AWS::CertificateManager::Certificate
     Properties:
       DomainName: !Join
@@ -129,9 +137,13 @@ Outputs:
     Export:
       Name: !Sub '${AWS::Region}-${AWS::StackName}-BeanstalkServiceRoleArn'
   SSLCertificate:
-    Value: !Ref SSLCertificate
+    Value: !Ref SSLCertificateLegacy
     Export:
       Name: !Sub '${AWS::Region}-${AWS::StackName}-SSLCertificate'
+  SSLCertificateNew:
+    Value: !Ref SSLCertificateNew
+    Export:
+      Name: !Sub '${AWS::Region}-${AWS::StackName}-SSLCertificateNew'
   AWSKmsKey:
     Value: !Ref AWSKmsKey
     Export:

@@ -1,0 +1,44 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: VPN Security Group for BridgeServer2 with MySQL Aurora access
+
+Parameters:
+  VpcId:
+    Type: String
+    Description: ID of the existing VPC (us-east-1-bridge-vpc-with-subnets-VPC)
+
+Resources:
+  RdsNewVpcSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: !Join
+        - '-'
+        - - !Ref 'AWS::StackName'
+          - RdsNewVpcSecurityGroup
+      VpcId: !ImportValue us-east-1-bridge-vpc-with-subnets-VPC
+  VpnSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: us-east-1-BridgeServer2-vpc-VpnSecurityGroup
+      GroupDescription: Security group for VPN with access to MySQL Aurora in BridgeServer2-vpc
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+          Description: Allow HTTPS for VPN
+        - IpProtocol: udp
+          FromPort: 1194
+          ToPort: 1194
+          CidrIp: 0.0.0.0/0
+          Description: Allow OpenVPN UDP
+      Tags:
+        - Key: Name
+          Value: us-east-1-BridgeServer2-vpc-VpnSecurityGroup
+
+Outputs:
+  VpnSecurityGroup:
+    Description: VPN Security Group ID
+    Value: !Ref VpnSecurityGroup
+    Export:
+      Name: us-east-1-BridgeServer2-vpc-VpnSecurityGroup

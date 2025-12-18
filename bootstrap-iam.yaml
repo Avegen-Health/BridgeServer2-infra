@@ -1,0 +1,39 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: IAM Role with Administrative Permissions for Bridge Infrastructure
+
+Parameters:
+  RoleName:
+    Type: String
+    Description: Name of the IAM role
+    Default: BridgeAdminRole
+  TrustedServices:
+    Type: CommaDelimitedList
+    Description: AWS services allowed to assume the role (e.g., lambda.amazonaws.com, elasticbeanstalk.amazonaws.com)
+    Default: lambda.amazonaws.com,elasticbeanstalk.amazonaws.com
+
+Resources:
+  AdminRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Ref RoleName
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: !Ref TrustedServices
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AdministratorAccess
+      Tags:
+        - Key: Name
+          Value: BridgeAdminRole
+        - Key: Project
+          Value: bridge
+
+Outputs:
+  AdminRoleArn:
+    Description: ARN of the Admin Role
+    Value: !GetAtt AdminRole.Arn
+    Export:
+      Name: !Sub ${AWS::Region}-bootstrap-CfServiceRoleArn

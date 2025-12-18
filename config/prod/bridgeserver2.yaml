@@ -36,6 +36,7 @@ parameters:
   SesNotificationTopicArn: arn:aws:sns:us-east-1:649232250620:SNSBounces
   SynapseAccessToken: !ssm /bridgeserver2-prod/SynapseAccessToken
   SynapseUser: !ssm /bridgeserver2-prod/SynapseUser
+  SSLCertificateArn: !ImportValue us-east-1-bridgeserver2-common-SSLCertificateNew
   SynapseOAuthClientId: !ssm /bridgeserver2-prod/SynapseOAuthClientId
   SynapseOAuthClientSecret: !ssm /bridgeserver2-prod/SynapseOAuthClientSecret
   UddSqsQueueUrl: https://sqs.us-east-1.amazonaws.com/433864969993/Bridge-WorkerPlatform-Request-prod
