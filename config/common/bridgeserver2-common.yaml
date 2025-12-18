@@ -1,2 +1,4 @@
 template_path: bridgeserver2-common.yaml
 stack_name: bridgeserver2-common
+parameters:
+  DNSDomainName: avegen.in
