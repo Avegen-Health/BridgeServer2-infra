@@ -45,17 +45,31 @@ Resources:
         - DomainName: '*.avegen.in'
           ValidationDomain: avegen.in
       ValidationMethod: DNS
-  SSLCertificateNew:
+  SSLCertificateProd:
     Type: AWS::CertificateManager::Certificate
     Properties:
       DomainName: !Join
         - '.'
-        - - '*'
+        - - 'bridge'
           - !Ref DNSDomainName
       DomainValidationOptions:
         - DomainName: !Join
             - '.'
-            - - '*'
+            - - 'bridge'
+              - !Ref DNSDomainName
+          ValidationDomain: !Ref DNSDomainName
+      ValidationMethod: DNS
+  SSLCertificateUat:
+    Type: AWS::CertificateManager::Certificate
+    Properties:
+      DomainName: !Join
+        - '.'
+        - - 'bridge-uat'
+          - !Ref DNSDomainName
+      DomainValidationOptions:
+        - DomainName: !Join
+            - '.'
+            - - 'bridge-uat'
               - !Ref DNSDomainName
           ValidationDomain: !Ref DNSDomainName
       ValidationMethod: DNS
@@ -140,10 +154,14 @@ Outputs:
     Value: !Ref SSLCertificateLegacy
     Export:
       Name: !Sub '${AWS::Region}-${AWS::StackName}-SSLCertificate'
-  SSLCertificateNew:
-    Value: !Ref SSLCertificateNew
+  SSLCertificateProd:
+    Value: !Ref SSLCertificateProd
     Export:
-      Name: !Sub '${AWS::Region}-${AWS::StackName}-SSLCertificateNew'
+      Name: !Sub '${AWS::Region}-${AWS::StackName}-SSLCertificateProd'
+  SSLCertificateUat:
+    Value: !Ref SSLCertificateUat
+    Export:
+      Name: !Sub '${AWS::Region}-${AWS::StackName}-SSLCertificateUat'
   AWSKmsKey:
     Value: !Ref AWSKmsKey
     Export:
