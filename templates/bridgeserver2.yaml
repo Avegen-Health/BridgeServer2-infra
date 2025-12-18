@@ -134,6 +134,9 @@ Parameters:
       - Immutable
   SesNotificationTopicArn:
     Type: String
+  SpringProfilesActive:
+    Type: String
+    Default: default
   SynapseAccessToken:
     Type: String
     NoEcho: true
@@ -447,6 +450,9 @@ Resources:
         - Namespace: 'aws:elasticbeanstalk:application:environment'
           OptionName: CUIMC_PROD_PASSWORD
           Value: !Ref CuimcProdPassword
+        - Namespace: 'aws:elasticbeanstalk:application:environment'
+          OptionName: SPRING_PROFILES_ACTIVE
+          Value: !Ref SpringProfilesActive
         - Namespace: 'aws:elasticbeanstalk:application:environment'
           OptionName: GBF_API_KEY
           Value: !Ref GbfApiKey
