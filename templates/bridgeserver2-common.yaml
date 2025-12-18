@@ -37,7 +37,7 @@ Resources:
             DeleteSourceFromS3: true
             Enabled: true
             MaxAgeInDays: 90
-  SSLCertificateLegacy:
+  SSLCertificate:
     Type: AWS::CertificateManager::Certificate
     Properties:
       DomainName: '*.avegen.in'
@@ -151,7 +151,7 @@ Outputs:
     Export:
       Name: !Sub '${AWS::Region}-${AWS::StackName}-BeanstalkServiceRoleArn'
   SSLCertificate:
-    Value: !Ref SSLCertificateLegacy
+    Value: !Ref SSLCertificate
     Export:
       Name: !Sub '${AWS::Region}-${AWS::StackName}-SSLCertificate'
   SSLCertificateProd:
