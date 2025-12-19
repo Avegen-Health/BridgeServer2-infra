@@ -12,6 +12,7 @@ parameters:
   AwsEbHealthReportingSystem: enhanced
   AwsSnsBounceNotificationEndpoint: akash.shinde@avegenhealth.com
   AwsSnsNotificationEndpoint: akash.shinde@avegenhealth.com
+  SpringProfilesActive: default
   BootstrapAdminEmail: !ssm /bridgeserver2-prod/BootstrapAdminEmail
   BootstrapAdminPassword: !ssm /bridgeserver2-prod/BootstrapAdminPassword
   BridgeEnv: prod
@@ -46,4 +47,4 @@ parameters:
   CuimcProdUsername: !ssm /bridgeserver2-common/CuimcProdUsername
   CuimcProdPassword: !ssm /bridgeserver2-common/CuimcProdPassword
   GbfApiKey: !ssm /bridgeserver2-common/GbfApiKey
-  SpringProfilesActive: noinit
+
