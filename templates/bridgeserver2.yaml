@@ -263,7 +263,7 @@ Resources:
           Value: '90'
         - Namespace: 'aws:elasticbeanstalk:container:tomcat:jvmoptions'
           OptionName: JVM Options
-          Value: '-Dnewrelic.config.file=/etc/newrelic.yml -javaagent:/usr/local/lib/newrelic/newrelic-agent.jar'
+          Value: '-Djava.io.tmpdir=/tmp -Dnewrelic.config.file=/etc/newrelic.yml -javaagent:/usr/local/lib/newrelic/newrelic-agent.jar'
         - Namespace: 'aws:elasticbeanstalk:container:tomcat:jvmoptions'
           OptionName: Xmx
           Value: '3584m'
