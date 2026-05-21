@@ -120,3 +120,4 @@ lambdas/*.zip
 # temporary files
 temp
 
+*.bak
