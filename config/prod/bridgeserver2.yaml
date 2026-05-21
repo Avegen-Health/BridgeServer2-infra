@@ -30,7 +30,7 @@ parameters:
   HibernateConnectionPassword: !ssm /bridgeserver2-prod/HibernateConnectionPassword
   HibernateConnectionUsername: !ssm /bridgeserver2-prod/HibernateConnectionUsername
   HibernateConnectionUsessl: 'true'
-  HostPostfix: .grip-research.org
+  HostPostfix: bridge.grip-research.org
   NewRelicAppName: bridgeserver-key
   NewRelicLicenseKey: !ssm /infra/NewRelicLicenseKey
   SesNotificationTopicArn: arn:aws:sns:us-east-1:233151233756:SNSBounces
