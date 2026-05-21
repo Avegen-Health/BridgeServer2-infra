@@ -5,6 +5,15 @@ Parameters:
     Description: DNS Domain name for Bridge Server
     Type: String
     Default: 'bridge-uat.grip-research.org'
+
+Conditions:
+  # The legacy SSLCertificate (*.bridge-uat.grip-research.org wildcard) is
+  # appropriate for the non-prod account where develop+uat live, but not
+  # for prod (whose ALB serves a different hostname and uses its own per-env
+  # cert in the BS2 stack — see SSLCertificate in templates/bridgeserver2.yaml).
+  # Gate cert creation by account ID so it only runs in non-prod.
+  IsNonProdAccount: !Equals [!Ref AWS::AccountId, '433864969993']
+
 Resources:
   BeanstalkServiceRole:
     Type: 'AWS::IAM::Role'
@@ -39,6 +48,7 @@ Resources:
             MaxAgeInDays: 90
   SSLCertificate:
     Type: AWS::CertificateManager::Certificate
+    Condition: IsNonProdAccount
     Properties:
       DomainName: !Join
         - '.'
@@ -129,6 +139,7 @@ Outputs:
     Export:
       Name: !Sub '${AWS::Region}-${AWS::StackName}-BeanstalkServiceRoleArn'
   SSLCertificate:
+    Condition: IsNonProdAccount
     Value: !Ref SSLCertificate
     Export:
       Name: !Sub '${AWS::Region}-${AWS::StackName}-SSLCertificate'
