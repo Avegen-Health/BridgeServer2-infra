@@ -1,6 +1,6 @@
 template_path: bridgeserver2-https-redirect.yaml
 stack_name: bridgeserver2-https-redirect-uat
-depedencies:
+dependencies:
   - uat/bridgeserver2.yaml
 parameters:
   LoadBalancerArn: "arn:aws:elasticloadbalancing:us-east-1:433864969993:loadbalancer/app/gv-bridge-uat/60688866d4a341da"

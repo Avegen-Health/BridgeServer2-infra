@@ -1,6 +1,6 @@
 template_path: bridgeserver2-https-redirect.yaml
 stack_name: bridgeserver2-https-redirect-prod
-depedencies:
+dependencies:
   - prod/bridgeserver2.yaml
 parameters:
   LoadBalancerArn: PLACEHOLDER_FILL_IN_AFTER_PHASE_7
