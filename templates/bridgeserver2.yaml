@@ -54,6 +54,9 @@ Parameters:
   CrcGeoCodeApiKey:
     Type: String
     NoEcho: true
+  CreateR53RecordParam:
+    Type: String
+    Default: false
   GbfApiKey:
     Type: String
     NoEcho: true
@@ -156,7 +159,9 @@ Parameters:
       - false
     ConstraintDescription: must be either true or false
 Conditions:
-  CreateR53Record: !Equals [ !Ref BridgeEnv, prod ]
+  CreateR53Record: !And
+    - !Equals [ !Ref BridgeEnv, prod ]
+    - !Equals [ !Ref CreateR53RecordParam, 'true' ]
 Resources:
   LoadBalancerAccessLogsBucket:
     Type: 'AWS::S3::Bucket'
