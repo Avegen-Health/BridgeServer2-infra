@@ -160,11 +160,33 @@ Parameters:
       - true
       - false
     ConstraintDescription: must be either true or false
+  SSLCertDomain:
+    Type: String
+    Default: ''
+    Description: |
+      Domain name for the ALB SSL cert. When empty (default), the BS2 stack
+      uses the legacy SSLCertificate exported by bridgeserver2-common. Set
+      to a specific domain (e.g. bridge.grip-research.org) to make this
+      stack create its own cert — used when the common stack's wildcard cert
+      can't validate for an env (e.g. prod where apex DNS isn't writable).
 Conditions:
   CreateR53Record: !And
     - !Equals [ !Ref BridgeEnv, prod ]
     - !Equals [ !Ref CreateR53RecordParam, 'true' ]
+  HasLocalCert: !Not [!Equals [!Ref SSLCertDomain, '']]
 Resources:
+  # Local SSL cert — only created when SSLCertDomain is set. When unset,
+  # the BS2 stack falls back to the legacy cert imported from bridgeserver2-common
+  # (see the !If in the ALB :443 listener).
+  SSLCertificate:
+    Type: AWS::CertificateManager::Certificate
+    Condition: HasLocalCert
+    Properties:
+      DomainName: !Ref SSLCertDomain
+      DomainValidationOptions:
+        - DomainName: !Ref SSLCertDomain
+          ValidationDomain: !Ref SSLCertDomain
+      ValidationMethod: DNS
   LoadBalancerAccessLogsBucket:
     Type: 'AWS::S3::Bucket'
     Properties:
@@ -328,7 +350,10 @@ Resources:
           Value: HTTPS
         - Namespace: 'aws:elbv2:listener:443'
           OptionName: SSLCertificateArns
-          Value: !ImportValue us-east-1-bridgeserver2-common-SSLCertificate
+          Value: !If
+            - HasLocalCert
+            - !Ref SSLCertificate
+            - !ImportValue us-east-1-bridgeserver2-common-SSLCertificate
         # ELB cipher and TLS protocol versions
         - Namespace: 'aws:elbv2:listener:443'
           OptionName: SSLPolicy

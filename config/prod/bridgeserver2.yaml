@@ -21,6 +21,7 @@ parameters:
   BucketSuffix: prod
   DNSHostname: bridge
   DNSDomain: bridge.grip-research.org
+  SSLCertDomain: bridge.grip-research.org
   EC2InstanceType: t3a.medium
   EmailUnsubscribeToken: !ssm /bridgeserver2-common/EmailUnsubscribeToken
   Env: production
