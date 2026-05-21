@@ -56,7 +56,9 @@ Parameters:
     NoEcho: true
   CreateR53RecordParam:
     Type: String
-    Default: false
+    AllowedValues: ['true', 'false']
+    Default: 'true'
+    Description: Set to 'false' to skip creating the Route 53 record and health check (e.g. when the zone is not in this account).
   GbfApiKey:
     Type: String
     NoEcho: true
