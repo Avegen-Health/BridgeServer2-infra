@@ -5,6 +5,21 @@ Parameters:
     Description: DNS Domain name for Bridge Server
     Type: String
     Default: 'bridge-uat.grip-research.org'
+  IssueSpecificCert:
+    Type: String
+    AllowedValues: ['true', 'false']
+    Default: 'false'
+    Description: |
+      When 'false' (default), issue a wildcard cert for *.<DNSDomainName>.
+      Backward-compatible — preserves develop/uat behavior.
+      When 'true', issue a specific cert for <DNSDomainName> exactly.
+      Use 'true' for prod when wildcard validation isn't possible
+      (e.g. when the apex DNS zone is in another DNS provider and
+      only a specific sub-zone is accessible for ACM DNS validation).
+
+Conditions:
+  UseSpecificCert: !Equals [!Ref IssueSpecificCert, 'true']
+
 Resources:
   BeanstalkServiceRole:
     Type: 'AWS::IAM::Role'
@@ -40,15 +55,15 @@ Resources:
   SSLCertificate:
     Type: AWS::CertificateManager::Certificate
     Properties:
-      DomainName: !Join
-        - '.'
-        - - '*'
-          - !Ref DNSDomainName
+      DomainName: !If
+        - UseSpecificCert
+        - !Ref DNSDomainName
+        - !Join ['.', ['*', !Ref DNSDomainName]]
       DomainValidationOptions:
-        - DomainName: !Join
-            - '.'
-            - - '*'
-              - !Ref DNSDomainName
+        - DomainName: !If
+            - UseSpecificCert
+            - !Ref DNSDomainName
+            - !Join ['.', ['*', !Ref DNSDomainName]]
           ValidationDomain: !Ref DNSDomainName
       ValidationMethod: DNS
   # KMS Keys
