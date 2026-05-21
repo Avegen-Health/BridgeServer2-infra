@@ -1,6 +1,6 @@
 template_path: bridgeserver2.yaml
 stack_name: bridgeserver2-prod
-depedencies:
+dependencies:
   - common/bridgeserver2-common.yaml
   - prod/bridgeserver2-db.yaml
 parameters:

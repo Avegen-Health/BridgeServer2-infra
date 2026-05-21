@@ -1,6 +1,6 @@
 template_path: bridgeserver2-db.yaml
 stack_name: bridgeserver2-db-prod
-depedencies:
+dependencies:
   - common/bridgeserver2-common-db.yaml
 parameters:
   DatabaseBackupRetentionDays: "30"
