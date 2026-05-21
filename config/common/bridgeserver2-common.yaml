@@ -1,11 +1,2 @@
 template_path: bridgeserver2-common.yaml
 stack_name: bridgeserver2-common
-{% if environment_variable.TRAVIS_BRANCH == "prod" %}
-# Prod-only overrides: prod uses an Avegen-owned sub-zone for cert
-# validation, so we issue a specific cert (not the default wildcard).
-# UAT/develop fall through to the template defaults (wildcard cert at
-# *.bridge-uat.grip-research.org via the template's Default value).
-parameters:
-  DNSDomainName: bridge.grip-research.org
-  IssueSpecificCert: 'true'
-{% endif %}
