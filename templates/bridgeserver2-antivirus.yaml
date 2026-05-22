@@ -154,14 +154,24 @@ Resources:
       Statistic: Sum
       Threshold: 10
       TreatMissingData: notBreaching
+  # Explicitly own the Lambda log group so the MetricFilter has something to
+  # attach to. Without this, CFN tries to create the filter against the
+  # auto-created /aws/lambda/<fn> log group, which doesn't exist until the
+  # Lambda's first invocation -> CREATE_FAILED "log group does not exist".
+  VirusScannerLambdaLogGroup:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      LogGroupName: !Sub '/aws/lambda/${VirusScannerLambda}'
+      RetentionInDays: 90
   VirusScannerLambdaErrorMetric:
     Type: "AWS::Logs::MetricFilter"
     DependsOn:
       - VirusScannerLambda
+      - VirusScannerLambdaLogGroup
     Properties:
-      LogGroupName: !Join
-        - ''
-        - - /aws/lambda/
+      LogGroupName: !Sub '/aws/lambda/${VirusScannerLambda}'
       FilterPattern: 'ERROR -"Not Found" -NoSuchKey -MethodNotAllowed'
       MetricTransformations:
         -

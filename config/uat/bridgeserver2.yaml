@@ -6,6 +6,9 @@ dependencies:
 parameters:
   AppDeployBucket: org-gvbridge-bridgeserver2-deployment-devstaging
   AppHealthcheckUrl: '/'
+  DeadLetterQueueArn: arn:aws:sqs:us-east-1:433864969993:Bridge-Dead-Letter-Queue
+  UsersignedConsentsBucket: bridgepf-prod-awss3usersignedconsentsdownloadbuck-1slz1bcz0mls7  # legacy Sage-prod name; preserved for UAT no-op
+  DocsBucket: docs-uat.grip-research.org
   AttachmentBucket: org-gvbridge-attachment-devstaging
   AwsAutoScalingMaxSize: '1'
   AwsAutoScalingMinSize: '1'
