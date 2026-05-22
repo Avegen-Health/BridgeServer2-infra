@@ -169,6 +169,15 @@ Parameters:
       to a specific domain (e.g. bridge.grip-research.org) to make this
       stack create its own cert — used when the common stack's wildcard cert
       can't validate for an env (e.g. prod where apex DNS isn't writable).
+  ListenerDefaultEnabled:
+    Type: String
+    Default: 'true'
+    AllowedValues: ['true', 'false']
+    Description: |
+      Whether EB creates the default port 80 listener (which forwards HTTP
+      to backend). Set to 'false' when the bridgeserver2-https-redirect
+      stack should own port 80 to do an HTTP→HTTPS 301 redirect at the ALB
+      level. Default 'true' preserves existing UAT behavior.
 Conditions:
   CreateR53Record: !And
     - !Equals [ !Ref BridgeEnv, prod ]
@@ -342,6 +351,9 @@ Resources:
         - Namespace: 'aws:elbv2:loadbalancer'
           OptionName: AccessLogsS3Enabled
           Value: 'true'
+        - Namespace: 'aws:elbv2:listener:default'
+          OptionName: ListenerEnabled
+          Value: !Ref ListenerDefaultEnabled
         - Namespace: 'aws:elbv2:listener:default'
           OptionName: Protocol
           Value: HTTP

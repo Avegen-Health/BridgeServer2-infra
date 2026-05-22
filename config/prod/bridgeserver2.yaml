@@ -22,6 +22,7 @@ parameters:
   DNSHostname: bridge
   DNSDomain: bridge.grip-research.org
   SSLCertDomain: bridge.grip-research.org
+  ListenerDefaultEnabled: 'false'   # let bridgeserver2-https-redirect-prod own port 80 (HTTP→HTTPS 301)
   EC2InstanceType: t3a.medium
   EmailUnsubscribeToken: !ssm /bridgeserver2-common/EmailUnsubscribeToken
   Env: production
