@@ -3,4 +3,4 @@ stack_name: bridgeserver2-https-redirect-prod
 dependencies:
   - prod/bridgeserver2.yaml
 parameters:
-  LoadBalancerArn: PLACEHOLDER_FILL_IN_AFTER_PHASE_7
+  LoadBalancerArn: arn:aws:elasticloadbalancing:us-east-1:233151233756:loadbalancer/app/awseb--AWSEB-81RZpz6JMBzp/af1b2ae0b2c2fb62

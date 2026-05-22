@@ -3,6 +3,6 @@ stack_name: bridgeserver2-dashboard-prod
 dependencies:
   - prod/bridgeserver2.yaml
 parameters:
-  AwsAutoScalingGroupName: PLACEHOLDER_FILL_IN_AFTER_PHASE_7
-  AwsLoadBalancerName: PLACEHOLDER_FILL_IN_AFTER_PHASE_7
+  AwsAutoScalingGroupName: awseb-e-kf2kkruu7a-stack-AWSEBAutoScalingGroup-pPkUosccgstz
+  AwsLoadBalancerName: awseb--AWSEB-81RZpz6JMBzp/af1b2ae0b2c2fb62
   EnvironmentName: bridgeserver2-prod
