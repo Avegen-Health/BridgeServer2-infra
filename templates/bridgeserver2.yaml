@@ -178,6 +178,36 @@ Parameters:
       to backend). Set to 'false' when the bridgeserver2-https-redirect
       stack should own port 80 to do an HTTP→HTTPS 301 redirect at the ALB
       level. Default 'true' preserves existing UAT behavior.
+  DeadLetterQueueArn:
+    Type: String
+    Description: |
+      ARN of the SQS Dead Letter Queue this env's SqsInitializer should wire
+      to its source queues. MUST be in the same AWS account as the source
+      queues (SQS RedrivePolicy rejects cross-account DLQs). This is a per-env
+      override for the `<BridgeEnv>.dead.letter.queue.arn` property whose
+      bundled .conf default points at the legacy non-prod queue.
+  UsersignedConsentsBucket:
+    Type: String
+    Description: |
+      S3 bucket BS2 uses for user-signed consents. Per-env override for the
+      `<BridgeEnv>.usersigned.consents.bucket` property. Default in BridgeServer2.conf
+      for `prod` is the legacy Sage-prod CFN-generated bucket name which we don't own.
+  DocsBucket:
+    Type: String
+    Description: |
+      S3 bucket for hosting Bridge's docs site. Per-env override for the
+      `<BridgeEnv>.docs.bucket` property. .conf default is `docs${host.postfix}`
+      which produces an unsuitable name when host.postfix has no leading separator.
+  EBSolutionStackName:
+    Type: String
+    Default: '64bit Amazon Linux 2 v4.13.3 running Tomcat 9 Corretto 8'
+    Description: |
+      Elastic Beanstalk solution stack. Default is AL2 v4.13.3 because the
+      bundled .ebextensions in BridgeServer2 (newrelic-server.config,
+      tomcatlogs.config) are AL2-specific (legacy newrelic-sysmond, EL5 RPM
+      URL, init.d, awslogs). Switching to AL2023 v5.14.0 will require
+      migrating those ebextensions first (drop sysmond, bump newrelic-infra
+      repo URL to amazonlinux/2023, replace awslogs with amazon-cloudwatch-agent).
 Conditions:
   CreateR53Record: !And
     - !Equals [ !Ref BridgeEnv, prod ]
@@ -228,7 +258,7 @@ Resources:
     Type: 'AWS::ElasticBeanstalk::ConfigurationTemplate'
     Properties:
       ApplicationName: !ImportValue us-east-1-bridgeserver2-common-BeanstalkAppName
-      SolutionStackName: '64bit Amazon Linux 2023 v5.14.0 running Tomcat 9 Corretto 8'
+      SolutionStackName: !Ref EBSolutionStackName
       OptionSettings:
         # EB environment options
         - Namespace: 'aws:autoscaling:asg'
@@ -454,6 +484,44 @@ Resources:
         - Namespace: 'aws:elasticbeanstalk:application:environment'
           OptionName: ses.notification.topic.arn
           Value: !Ref SesNotificationTopicArn
+        # The bundled BridgeServer2.conf hard-codes `prod.dead.letter.queue.arn`
+        # and `prod.aws.account.id` to the non-prod Bridge account (433864969993)
+        # — BS2 was never deployed in a prod-isolated AWS account before, so
+        # these prod.* overrides were never exercised. We override them here per
+        # env via OptionSetting, the same pattern as ses.notification.topic.arn.
+        # SqsInitializer fails with "Dead-letter target owner should be same as
+        # the source" if the DLQ ARN points outside the source-queue account.
+        - Namespace: 'aws:elasticbeanstalk:application:environment'
+          OptionName: !Join
+            - ''
+            - - !Ref BridgeEnv
+              - '.dead.letter.queue.arn'
+          Value: !Ref DeadLetterQueueArn
+        - Namespace: 'aws:elasticbeanstalk:application:environment'
+          OptionName: !Join
+            - ''
+            - - !Ref BridgeEnv
+              - '.aws.account.id'
+          Value: !Ref AWS::AccountId
+        # The bundled BridgeServer2.conf hard-codes prod.usersigned.consents.bucket
+        # to a legacy Sage-prod CFN-generated bucket name we don't own. S3Initializer's
+        # doesBucketExistV2 returns true (bucket exists globally), then GetBucketNotification
+        # 403s (cross-account). Override per env to a prod-owned bucket name.
+        - Namespace: 'aws:elasticbeanstalk:application:environment'
+          OptionName: !Join
+            - ''
+            - - !Ref BridgeEnv
+              - '.usersigned.consents.bucket'
+          Value: !Ref UsersignedConsentsBucket
+        # docs.bucket defaults to docs${host.postfix}, but host.postfix in prod
+        # has no leading separator -> resolves to "docsbridge.grip-research.org".
+        # Override per env so we get a clean name.
+        - Namespace: 'aws:elasticbeanstalk:application:environment'
+          OptionName: !Join
+            - ''
+            - - !Ref BridgeEnv
+              - '.docs.bucket'
+          Value: !Ref DocsBucket
         - Namespace: 'aws:elasticbeanstalk:application:environment'
           OptionName: synapse.access.token
           Value: !Ref SynapseAccessToken
@@ -594,6 +662,13 @@ Resources:
     Type: 'AWS::S3::Bucket'
     Properties:
       BucketName: !Ref AppDeployBucket
+      # EB's platform-hooks/deploy worker uploads bundles with bucket-owner-full-control ACLs,
+      # so the deploy bucket cannot be BucketOwnerEnforced (which blocks ACLs entirely).
+      # Use BucketOwnerPreferred: ACLs still work, and any ACL-tagged uploads are auto-owned
+      # by the bucket owner. New AWS accounts default new buckets to Enforced, hence the explicit setting.
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerPreferred
       PublicAccessBlockConfiguration:
         BlockPublicAcls: true
         BlockPublicPolicy: true

@@ -48,3 +48,6 @@ parameters:
   CuimcProdPassword: !ssm /bridgeserver2-common/CuimcProdPassword
   GbfApiKey: !ssm /bridgeserver2-common/GbfApiKey
   CreateR53RecordParam: 'false'   # Phase 0 option (b): zone not yet in prod account. Flip to 'true' after zone migration (see Appendix C).
+  DeadLetterQueueArn: arn:aws:sqs:us-east-1:233151233756:Bridge-Dead-Letter-Queue
+  UsersignedConsentsBucket: org-gvbridge-usersigned-consents-prod
+  DocsBucket: docs.bridge.grip-research.org
