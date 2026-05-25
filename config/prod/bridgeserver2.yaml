@@ -10,7 +10,7 @@ parameters:
   AwsAutoScalingMaxSize: "4"
   AwsAutoScalingMinSize: "3"
   AwsEbHealthReportingSystem: enhanced
-  AwsSnsBounceNotificationEndpoint: bridge+prod_bounce_notif@avegenhealth.com
+  AwsSnsBounceNotificationEndpoint: bridge+snsbounce@avegenhealth.com
   AwsSnsNotificationEndpoint: bridge+prod_ops_notif@avegenhealth.com
   BootstrapAdminEmail: !ssm /bridgeserver2-prod/BootstrapAdminEmail
   BootstrapAdminPassword: !ssm /bridgeserver2-prod/BootstrapAdminPassword
