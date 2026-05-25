@@ -198,6 +198,15 @@ Parameters:
       S3 bucket for hosting Bridge's docs site. Per-env override for the
       `<BridgeEnv>.docs.bucket` property. .conf default is `docs${host.postfix}`
       which produces an unsuitable name when host.postfix has no leading separator.
+  WebservicesUrl:
+    Type: String
+    Default: ''
+    Description: |
+      Full HTTPS URL of the BS2 API (e.g. https://bridge.grip-research.org). Per-env
+      override for the `<BridgeEnv>.webservices.url` property. Required when HostPostfix
+      has no leading separator (prod convention), because the .conf default
+      `https://bridge${host.postfix}` would produce https://bridgebridge.grip-research.org.
+      Leave blank for envs where HostPostfix has a leading separator (dev, uat).
   EBSolutionStackName:
     Type: String
     Default: '64bit Amazon Linux 2 v4.13.3 running Tomcat 9 Corretto 8'
@@ -213,6 +222,7 @@ Conditions:
     - !Equals [ !Ref BridgeEnv, prod ]
     - !Equals [ !Ref CreateR53RecordParam, 'true' ]
   HasLocalCert: !Not [!Equals [!Ref SSLCertDomain, '']]
+  HasWebservicesUrl: !Not [!Equals [!Ref WebservicesUrl, '']]
 Resources:
   # Local SSL cert — only created when SSLCertDomain is set. When unset,
   # the BS2 stack falls back to the legacy cert imported from bridgeserver2-common
@@ -522,6 +532,20 @@ Resources:
             - - !Ref BridgeEnv
               - '.docs.bucket'
           Value: !Ref DocsBucket
+        # webservices.url defaults to https://bridge${host.postfix}. When HostPostfix
+        # has no leading separator (prod), this produces https://bridgebridge.grip-research.org.
+        # S3Initializer reads the docs.bucket base key so HostPostfix must remain
+        # bridge.grip-research.org; override webservices.url directly instead.
+        # Omit (leave WebservicesUrl='') for envs where HostPostfix has a leading separator.
+        - !If
+          - HasWebservicesUrl
+          - Namespace: 'aws:elasticbeanstalk:application:environment'
+            OptionName: !Join
+              - ''
+              - - !Ref BridgeEnv
+                - '.webservices.url'
+            Value: !Ref WebservicesUrl
+          - !Ref AWS::NoValue
         - Namespace: 'aws:elasticbeanstalk:application:environment'
           OptionName: synapse.access.token
           Value: !Ref SynapseAccessToken
