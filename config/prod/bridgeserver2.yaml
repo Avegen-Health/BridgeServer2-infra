@@ -32,7 +32,7 @@ parameters:
   HibernateConnectionPassword: !ssm /bridgeserver2-prod/HibernateConnectionPassword
   HibernateConnectionUsername: !ssm /bridgeserver2-prod/HibernateConnectionUsername
   HibernateConnectionUsessl: 'true'
-  HostPostfix: .grip-research.org
+  HostPostfix: bridge.grip-research.org
   NewRelicAppName: bridgeserver-key
   NewRelicLicenseKey: !ssm /infra/NewRelicLicenseKey
   SesNotificationTopicArn: arn:aws:sns:us-east-1:233151233756:SNSBounces
@@ -51,3 +51,4 @@ parameters:
   DeadLetterQueueArn: arn:aws:sqs:us-east-1:233151233756:Bridge-Dead-Letter-Queue
   UsersignedConsentsBucket: org-gvbridge-usersigned-consents-prod
   DocsBucket: docs.bridge.grip-research.org
+  WebservicesUrl: https://bridge.grip-research.org
