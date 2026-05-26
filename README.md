@@ -35,3 +35,4 @@ To install these custom resolvers, create the resolvers directory in the root of
 wget https://raw.githubusercontent.com/cloudreach/sceptre/v1/contrib/ssm-resolver/ssm.py -O resolvers/ssm.py
 wget https://raw.githubusercontent.com/cloudreach/sceptre/v1/contrib/kms-resolver/kms.py -O resolvers/kms.py
 ```
+
