@@ -12,9 +12,9 @@ install:
   - ./setup_aws_cli.sh || travis_terminate 1
   - pip install --upgrade pip setuptools wheel
   - pip install PyYAML==6.0.1
-  - pip install deepdiff@git+https://github.com/seperman/deepdiff.git
+  - pip install deepdiff
   - pip install aws-sam-translator>=1.50.0
-  - pip install cfn-lint
+  - pip install cfn-lint==1.43.1
   - pip install sceptre>=4
   - pip install sceptre-ssm-resolver
 stages:
