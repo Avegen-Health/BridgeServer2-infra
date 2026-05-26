@@ -168,7 +168,6 @@ Resources:
   VirusScannerLambdaErrorMetric:
     Type: "AWS::Logs::MetricFilter"
     DependsOn:
-      - VirusScannerLambda
       - VirusScannerLambdaLogGroup
     Properties:
       LogGroupName: !Sub '/aws/lambda/${VirusScannerLambda}'
