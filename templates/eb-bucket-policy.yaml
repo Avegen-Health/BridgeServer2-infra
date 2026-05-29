@@ -1,0 +1,140 @@
+Description: >
+  Augments the EB-managed bucket policy on elasticbeanstalk-<region>-<account> to allow
+  the elasticbeanstalk.amazonaws.com and cloudformation.amazonaws.com service principals
+  to read source-bundle objects.
+
+  WHEN TO RUN: Deploy this stack AFTER all three EB environments (BS2, BWP, BX) have been
+  created in the account for the first time.  EB creates the bucket and sets up its own
+  policy statements (EC2 instance role grants) when the first environment is created.
+  This stack then adds the missing service-principal grants so that EB can read the
+  source-bundle ZIP from the bucket root during rolling deploys.
+
+  WHY THIS IS NEEDED: When Travis CI uploads a source-bundle ZIP (WAR + .platform/hooks/)
+  the object lands at the bucket root.  EB's CF-managed UpdateStack call reads that object
+  using the elasticbeanstalk / cloudformation service principal.  Without an explicit ALLOW
+  in the bucket policy for those principals the S3 read fails with:
+    "Service:AmazonCloudFormation, Message:S3 error: Access Denied"
+  even though the travis-ci IAM user (the caller) has s3:* on the bucket.  The dev/UAT
+  accounts work because their EB buckets have no bucket policy at all (pure-IAM access);
+  a fresh prod account that gets only the EB-generated policy is missing this grant.
+
+AWSTemplateFormatVersion: 2010-09-09
+
+Parameters:
+  EBBucket:
+    Description: >
+      Name of the EB-managed S3 bucket.  Follows the EB naming convention
+      elasticbeanstalk-<region>-<account_id>.
+    Type: String
+    Default: elasticbeanstalk-us-east-1-233151233756
+
+Resources:
+
+  # ── Bucket policy augmentation ───────────────────────────────────────────────
+  # We cannot use AWS::S3::BucketPolicy here because that resource REPLACES the
+  # entire bucket policy, wiping the EC2 instance-role grants that EB manages.
+  # Instead we use a custom Lambda that MERGES a new statement into the existing
+  # policy without touching EB's own statements.
+  #
+  # The Lambda reads the current policy, appends the EBServiceReadSourceBundle
+  # statement if it is not already present, and writes it back.
+  EBBucketPolicyAugmentFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub '${AWS::StackName}-augment-eb-policy'
+      Handler: index.handler
+      Runtime: python3.12
+      Timeout: 30
+      Role: !GetAtt EBBucketPolicyAugmentRole.Arn
+      Environment:
+        Variables:
+          EB_BUCKET: !Ref EBBucket
+          ACCOUNT_ID: !Ref AWS::AccountId
+      Code:
+        ZipFile: |
+          import json, os, boto3, cfnresponse
+
+          SID = "EBServiceReadSourceBundle"
+
+          def handler(event, context):
+              s3 = boto3.client('s3')
+              bucket = os.environ['EB_BUCKET']
+              account = os.environ['ACCOUNT_ID']
+
+              if event['RequestType'] == 'Delete':
+                  # Remove the statement we added (leave EB-managed statements intact)
+                  try:
+                      resp = s3.get_bucket_policy(Bucket=bucket)
+                      policy = json.loads(resp['Policy'])
+                      policy['Statement'] = [s for s in policy['Statement']
+                                             if s.get('Sid') != SID]
+                      s3.put_bucket_policy(Bucket=bucket, Policy=json.dumps(policy))
+                  except s3.exceptions.NoSuchBucketPolicy:
+                      pass
+                  cfnresponse.send(event, context, cfnresponse.SUCCESS, {})
+                  return
+
+              # Create / Update
+              try:
+                  resp = s3.get_bucket_policy(Bucket=bucket)
+                  policy = json.loads(resp['Policy'])
+              except s3.exceptions.NoSuchBucketPolicy:
+                  policy = {'Version': '2012-10-17', 'Statement': []}
+
+              # Remove any stale copy of our statement then re-add
+              policy['Statement'] = [s for s in policy['Statement'] if s.get('Sid') != SID]
+              policy['Statement'].append({
+                  'Sid': SID,
+                  'Effect': 'Allow',
+                  'Principal': {
+                      'Service': [
+                          'elasticbeanstalk.amazonaws.com',
+                          'cloudformation.amazonaws.com',
+                      ]
+                  },
+                  'Action': ['s3:GetObject', 's3:GetObjectVersion'],
+                  'Resource': f'arn:aws:s3:::{bucket}/*',
+                  'Condition': {
+                      'StringEquals': {'aws:SourceAccount': account}
+                  },
+              })
+              s3.put_bucket_policy(Bucket=bucket, Policy=json.dumps(policy))
+              cfnresponse.send(event, context, cfnresponse.SUCCESS,
+                               {'BucketPolicyUpdated': bucket})
+
+  EBBucketPolicyAugmentRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${AWS::StackName}-lambda-role'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: S3BucketPolicyReadWrite
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetBucketPolicy
+                  - s3:PutBucketPolicy
+                Resource: !Sub 'arn:aws:s3:::${EBBucket}'
+
+  EBBucketPolicyAugmentTrigger:
+    Type: AWS::CloudFormation::CustomResource
+    Properties:
+      ServiceToken: !GetAtt EBBucketPolicyAugmentFunction.Arn
+      # Changing this value forces a re-run on stack update
+      PolicyVersion: '1'
+
+Outputs:
+  EBBucketPolicyStatus:
+    Value: !GetAtt EBBucketPolicyAugmentTrigger.BucketPolicyUpdated
+    Description: >
+      Name of the EB bucket whose policy was augmented with service-principal grants.

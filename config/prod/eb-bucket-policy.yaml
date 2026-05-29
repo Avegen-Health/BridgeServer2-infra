@@ -1,0 +1,4 @@
+template_path: eb-bucket-policy.yaml
+stack_name: eb-bucket-policy-prod
+parameters:
+  EBBucket: elasticbeanstalk-us-east-1-233151233756
