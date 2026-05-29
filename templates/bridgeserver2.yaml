@@ -698,6 +698,35 @@ Resources:
         BlockPublicPolicy: true
         IgnorePublicAcls: true
         RestrictPublicBuckets: true
+  # Bucket policy: allow EB and CF service principals to read source-bundle ZIPs
+  # from this bucket.  When Travis CI uploads eb-bundle.zip here,
+  # elasticbeanstalk.amazonaws.com / cloudformation.amazonaws.com read it back
+  # when processing UpdateEnvironment.  Without an explicit allow in the bucket
+  # policy (or on the EB-managed elasticbeanstalk-<region>-<acct> bucket), those
+  # service principals are denied, producing:
+  #   "Service:AmazonCloudFormation, Message:S3 error: Access Denied"
+  # See BridgeKB gotcha E.24 for the same issue on the elasticbeanstalk-* bucket.
+  AWSS3AppDeployBucketPolicy:
+    Type: 'AWS::S3::BucketPolicy'
+    Properties:
+      Bucket: !Ref AWSS3AppDeployBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: EBServiceReadSourceBundle
+            Effect: Allow
+            Principal:
+              Service:
+                - elasticbeanstalk.amazonaws.com
+                - cloudformation.amazonaws.com
+            Action:
+              - s3:GetObject
+              - s3:GetObjectVersion
+            Resource: !Sub 'arn:aws:s3:::${AppDeployBucket}/*'
+            Condition:
+              StringEquals:
+                aws:SourceAccount: !Ref AWS::AccountId
+
   AWSR53RecordSet:
     Type: 'AWS::Route53::RecordSet'
     # This check is bugged. See https://github.com/aws-cloudformation/cfn-python-lint/issues/1425
