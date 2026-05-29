@@ -22,6 +22,7 @@ Resources:
   TravisCIUser:
     Type: AWS::IAM::User
     DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
     Properties:
       UserName: travis-ci
       ManagedPolicyArns:
@@ -37,6 +38,7 @@ Resources:
   TravisAppDeployPolicy:
     Type: AWS::IAM::ManagedPolicy
     DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
     Properties:
       ManagedPolicyName: TravisAppDeployPolicy
       PolicyDocument:
