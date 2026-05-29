@@ -1,0 +1,139 @@
+Description: >
+  IAM user and deploy policy for Travis CI prod deployments (BS2, BWP, BX, BSM UI).
+  This stack is prod-only. A fresh-account deploy must run this stack before the
+  first Travis-triggered EB deploy, then update Travis CI project settings with
+  the generated access key.
+
+AWSTemplateFormatVersion: 2010-09-09
+
+Parameters:
+  AppDeployBucketBS2:
+    Description: S3 bucket Travis uploads the BS2 WAR/bundle to (EB source bundle bucket for BS2)
+    Type: String
+    Default: org-gvbridge-bridgeserver2-deployment-prod
+  BSMBucket:
+    Description: S3 bucket for the BSM Researcher UI SPA
+    Type: String
+    Default: bsm.grip-research.org
+
+Resources:
+
+  # ── IAM User ────────────────────────────────────────────────────────────────
+  TravisCIUser:
+    Type: AWS::IAM::User
+    DeletionPolicy: Retain
+    Properties:
+      UserName: travis-ci
+      ManagedPolicyArns:
+        - !Ref TravisAppDeployPolicy
+
+  # ── Deploy policy ────────────────────────────────────────────────────────────
+  # Permissions required for Travis CI to:
+  #   1. Upload the source bundle ZIP to S3 (EB + app deploy buckets)
+  #   2. Call elasticbeanstalk:CreateApplicationVersion / UpdateEnvironment
+  #   3. EB internally calls cloudformation:UpdateStack to apply the new version
+  #   4. EB platform hooks call logs:CreateLogGroup when setting up CWAgent
+  #      log streaming on each new environment update
+  TravisAppDeployPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    DeletionPolicy: Retain
+    Properties:
+      ManagedPolicyName: TravisAppDeployPolicy
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+
+          # Pass the CF service role (used by infra Travis deploys via BridgeServer2-infra)
+          - Sid: PassCfServiceRole
+            Effect: Allow
+            Action: sts:AssumeRole
+            Resource: !Sub 'arn:aws:iam::${AWS::AccountId}:role/AwsCfServiceRole'
+
+          # S3: upload source bundle and BSM UI assets
+          - Sid: EBDeployS3
+            Effect: Allow
+            Action: s3:*
+            Resource:
+              - !Sub 'arn:aws:s3:::${AppDeployBucketBS2}'
+              - !Sub 'arn:aws:s3:::${AppDeployBucketBS2}/*'
+              # EB-managed source bundle bucket (shared by BWP + BX + BS2)
+              - !Sub 'arn:aws:s3:::elasticbeanstalk-${AWS::Region}-${AWS::AccountId}'
+              - !Sub 'arn:aws:s3:::elasticbeanstalk-${AWS::Region}-${AWS::AccountId}/*'
+              # BSM Researcher UI SPA
+              - !Sub 'arn:aws:s3:::${BSMBucket}'
+              - !Sub 'arn:aws:s3:::${BSMBucket}/*'
+
+          # EB: register new app version and trigger environment update
+          - Sid: EBDeploy
+            Effect: Allow
+            Action:
+              - elasticbeanstalk:CreateApplicationVersion
+              - elasticbeanstalk:UpdateEnvironment
+              - elasticbeanstalk:DescribeEnvironments
+              - elasticbeanstalk:DescribeApplicationVersions
+              - elasticbeanstalk:DescribeApplications
+              - elasticbeanstalk:ListTagsForResource
+            Resource: '*'
+
+          # CloudFormation: EB calls UpdateStack on its own environment stack
+          # during each UpdateEnvironment call — the deploying user must have this.
+          - Sid: CFAll
+            Effect: Allow
+            Action: cloudformation:*
+            Resource: '*'
+
+          # Auto Scaling: EB suspend/resume during rolling deploys
+          - Sid: EBDeployAutoscaling
+            Effect: Allow
+            Action:
+              - autoscaling:DescribeAutoScalingGroups
+              - autoscaling:DescribeScalingActivities
+              - autoscaling:ResumeProcesses
+              - autoscaling:SuspendProcesses
+            Resource: '*'
+
+          # ELB: EB reads/updates target group registration during deploy
+          - Sid: EBDeployELB
+            Effect: Allow
+            Action: elasticloadbalancing:*
+            Resource: '*'
+
+          # EC2: EB reads instance/subnet/SG metadata during deploy
+          - Sid: EBDeployEC2Read
+            Effect: Allow
+            Action: ec2:Describe*
+            Resource: '*'
+
+          # CloudWatch Logs: EB platform creates log groups for CWAgent
+          # streaming (nginx, httpd, eb-engine) during each environment update.
+          # Without this, EB emits "not authorized to perform logs:CreateLogGroup"
+          # and the deploy fails immediately.
+          - Sid: EBCWLogs
+            Effect: Allow
+            Action:
+              - logs:CreateLogGroup
+              - logs:CreateLogStream
+              - logs:DescribeLogGroups
+              - logs:DescribeLogStreams
+              - logs:PutLogEvents
+              - logs:PutRetentionPolicy
+            Resource: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/elasticbeanstalk/*'
+
+Outputs:
+  TravisCIUserName:
+    Value: !Ref TravisCIUser
+    Export:
+      Name: !Sub '${AWS::Region}-${AWS::StackName}-TravisCIUser'
+  TravisAppDeployPolicyArn:
+    Value: !Ref TravisAppDeployPolicy
+    Export:
+      Name: !Sub '${AWS::Region}-${AWS::StackName}-TravisAppDeployPolicyArn'
+  PostDeployNote:
+    Description: >
+      After stack creation, generate an access key for the travis-ci user:
+        aws iam create-access-key --user-name travis-ci --profile bridge-prod
+      Then for each app repo (BridgeServer2, BridgeWorkerPlatform, Bridge-Exporter):
+        1. Set AwsTravisAccessKey_prod = <AccessKeyId> in the Travis CI project settings.
+        2. Re-encrypt the secret: travis encrypt --com '<SecretAccessKey>' --add deploy.secret_access_key.prod
+           and commit the updated .travis.yml.
+    Value: See description
