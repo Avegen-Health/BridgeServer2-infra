@@ -45,6 +45,7 @@ Resources:
           SID = "EBServiceReadSourceBundle"
 
           def handler(event, context):
+            try:
               s3 = boto3.client('s3')
               bucket = os.environ['EB_BUCKET']
               account = os.environ['ACCOUNT_ID']
@@ -89,6 +90,8 @@ Resources:
               s3.put_bucket_policy(Bucket=bucket, Policy=json.dumps(policy))
               cfnresponse.send(event, context, cfnresponse.SUCCESS,
                                {'BucketPolicyUpdated': bucket})
+            except Exception as e:
+              cfnresponse.send(event, context, cfnresponse.FAILED, {'Error': str(e)})
 
   EBBucketPolicyAugmentRole:
     Type: AWS::IAM::Role

@@ -45,10 +45,10 @@ Resources:
         Version: '2012-10-17'
         Statement:
 
-          # Pass the CF service role (used by infra Travis deploys via BridgeServer2-infra)
+          # Pass the CF service role to CloudFormation during sceptre/cfn-deploy calls
           - Sid: PassCfServiceRole
             Effect: Allow
-            Action: sts:AssumeRole
+            Action: iam:PassRole
             Resource: !Sub 'arn:aws:iam::${AWS::AccountId}:role/AwsCfServiceRole'
 
           # S3: upload source bundle and BSM UI assets
