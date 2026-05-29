@@ -40,7 +40,30 @@ Resources:
           ACCOUNT_ID: !Ref AWS::AccountId
       Code:
         ZipFile: |
-          import json, os, boto3, cfnresponse
+          import json, os, boto3, urllib.request
+
+          # cfnresponse is not auto-injected in python3.12 ZipFile deployments;
+          # implement the send helper inline using urllib (no extra dependencies).
+          SUCCESS = "SUCCESS"
+          FAILED  = "FAILED"
+
+          def _send(event, context, status, data):
+              body = json.dumps({
+                  'Status': status,
+                  'Reason': 'See CW log stream: ' + context.log_stream_name,
+                  'PhysicalResourceId': context.log_stream_name,
+                  'StackId': event['StackId'],
+                  'RequestId': event['RequestId'],
+                  'LogicalResourceId': event['LogicalResourceId'],
+                  'Data': data or {},
+              }).encode('utf-8')
+              req = urllib.request.Request(
+                  event['ResponseURL'],
+                  data=body,
+                  headers={'content-type': '', 'content-length': str(len(body))},
+                  method='PUT',
+              )
+              urllib.request.urlopen(req)
 
           SID = "EBServiceReadSourceBundle"
 
@@ -60,7 +83,7 @@ Resources:
                       s3.put_bucket_policy(Bucket=bucket, Policy=json.dumps(policy))
                   except s3.exceptions.NoSuchBucketPolicy:
                       pass
-                  cfnresponse.send(event, context, cfnresponse.SUCCESS, {})
+                  _send(event, context, SUCCESS, {})
                   return
 
               # Create / Update
@@ -88,10 +111,9 @@ Resources:
                   },
               })
               s3.put_bucket_policy(Bucket=bucket, Policy=json.dumps(policy))
-              cfnresponse.send(event, context, cfnresponse.SUCCESS,
-                               {'BucketPolicyUpdated': bucket})
+              _send(event, context, SUCCESS, {'BucketPolicyUpdated': bucket})
             except Exception as e:
-              cfnresponse.send(event, context, cfnresponse.FAILED, {'Error': str(e)})
+              _send(event, context, FAILED, {'Error': str(e)})
 
   EBBucketPolicyAugmentRole:
     Type: AWS::IAM::Role
