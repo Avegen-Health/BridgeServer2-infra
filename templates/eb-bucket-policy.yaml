@@ -1,22 +1,10 @@
 Description: >
-  Augments the EB-managed bucket policy on elasticbeanstalk-<region>-<account> to allow
-  the elasticbeanstalk.amazonaws.com and cloudformation.amazonaws.com service principals
-  to read source-bundle objects.
-
-  WHEN TO RUN: Deploy this stack AFTER all three EB environments (BS2, BWP, BX) have been
-  created in the account for the first time.  EB creates the bucket and sets up its own
-  policy statements (EC2 instance role grants) when the first environment is created.
-  This stack then adds the missing service-principal grants so that EB can read the
-  source-bundle ZIP from the bucket root during rolling deploys.
-
-  WHY THIS IS NEEDED: When Travis CI uploads a source-bundle ZIP (WAR + .platform/hooks/)
-  the object lands at the bucket root.  EB's CF-managed UpdateStack call reads that object
-  using the elasticbeanstalk / cloudformation service principal.  Without an explicit ALLOW
-  in the bucket policy for those principals the S3 read fails with:
-    "Service:AmazonCloudFormation, Message:S3 error: Access Denied"
-  even though the travis-ci IAM user (the caller) has s3:* on the bucket.  The dev/UAT
-  accounts work because their EB buckets have no bucket policy at all (pure-IAM access);
-  a fresh prod account that gets only the EB-generated policy is missing this grant.
+  Grants elasticbeanstalk.amazonaws.com and cloudformation.amazonaws.com GetObject access
+  on the EB-managed source-bundle bucket (elasticbeanstalk-<region>-<acct>).
+  Without this, EB rolling deploys fail with S3 Access Denied when CF reads the
+  source-bundle ZIP uploaded by Travis CI (see BridgeKB gotcha E.24).
+  Deploy AFTER all three EB environments exist so EC2 instance-role statements
+  are already present in the bucket policy before this stack merges its statement.
 
 AWSTemplateFormatVersion: 2010-09-09
 
