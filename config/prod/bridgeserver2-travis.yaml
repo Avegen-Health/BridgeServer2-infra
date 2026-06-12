@@ -1,0 +1,5 @@
+template_path: bridgeserver2-travis.yaml
+stack_name: bridgeserver2-travis-prod
+parameters:
+  AppDeployBucketBS2: org-gvbridge-bridgeserver2-deployment-prod
+  BSMBucket: bsm.grip-research.org
