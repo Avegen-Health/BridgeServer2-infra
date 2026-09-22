@@ -43,9 +43,12 @@ parameters:
   SynapseOAuthClientSecret: !ssm /bridgeserver2-uat/SynapseOAuthClientSecret
   UddSqsQueueUrl: https://sqs.us-east-1.amazonaws.com/433864969993/Bridge-WorkerPlatform-Request-staging
   # ADDF export request queue in the uat account (433864969993) - must match BWP-infra's AddfExportRequestSqsQueueUrl
-  # (the worker consumes it). Kept enabled=false; Phase 8 flips the kill-switch on.
+  # (the worker consumes it).
   AddfExportRequestSqsQueueUrl: https://sqs.us-east-1.amazonaws.com/433864969993/Bridge-ADDF-Export-Request-uat
-  AddfExportEnabled: 'false'
+  # Phase 8-lite: ACCUMULATE ON for uat. Gates both BS2 fan-outs (AddfExportEnqueuer +
+  # AddfParticipantVersionEnqueuer), which run AFTER the E3/Synapse send (log-and-swallow) - E3 untouched.
+  # Publish stays OFF (addf.publish.enabled) until validated. Rollback = flip back to 'false'.
+  AddfExportEnabled: 'true'
   CrcGeoCodeApiKey: !ssm /bridgeserver2-uat/CrcGeoCodeApiKey
   CuimcTestUsername: !ssm /bridgeserver2-common/CuimcTestUsername
   CuimcTestPassword: !ssm /bridgeserver2-common/CuimcTestPassword
