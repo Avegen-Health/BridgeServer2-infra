@@ -153,6 +153,14 @@ Parameters:
     Description: The OAuth client registered with Synapse that enables BSM sign in via Synapse
   UddSqsQueueUrl:
     Type: String
+  AddfExportRequestSqsQueueUrl:
+    Type: String
+    Default: ''
+    Description: ADDF export request queue URL - the completeUpload / participant-version fan-out enqueues here. Set per-env in config/<env>.
+  AddfExportEnabled:
+    Type: String
+    Default: 'false'
+    Description: Kill-switch - BS2 enqueues ADDF export requests only when 'true'. Global default off; flip per-env in Phase 8.
   UseHttpsForwarding:
     Type: String
     Default: true
@@ -561,6 +569,15 @@ Resources:
         - Namespace: 'aws:elasticbeanstalk:application:environment'
           OptionName: udd.sqs.queue.url
           Value: !Ref UddSqsQueueUrl
+        # ADDF export fan-out target + kill-switch (read by AddfExportEnqueuer / AddfParticipantVersionEnqueuer).
+        # Safe unconditionally: the enqueuer only sends when addf.export.enabled='true' (default off), so envs
+        # without a queue URL never use it.
+        - Namespace: 'aws:elasticbeanstalk:application:environment'
+          OptionName: addf.export.request.sqs.queue.url
+          Value: !Ref AddfExportRequestSqsQueueUrl
+        - Namespace: 'aws:elasticbeanstalk:application:environment'
+          OptionName: addf.export.enabled
+          Value: !Ref AddfExportEnabled
         - Namespace: 'aws:elasticbeanstalk:application:environment'
           OptionName: use.https.forwarding
           Value: !Ref UseHttpsForwarding
