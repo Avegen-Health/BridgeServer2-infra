@@ -24,6 +24,7 @@ parameters:
   BucketSuffix: devstaging
   DNSHostname: bridge-uat
   DNSDomain: bridge-uat.grip-research.org
+  SSLCertDomain: bridge-uat.grip-research.org
   EC2InstanceType: t3a.medium
   EmailUnsubscribeToken: !ssm /bridgeserver2-common/EmailUnsubscribeToken
   Env: staging
